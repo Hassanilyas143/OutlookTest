@@ -7,23 +7,43 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { authorize } from 'react-native-app-auth'
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+const outlookConfig = {
+  clientId: '939feb62-57dd-4798-830e-4c3066ae3ed1',
+  redirectUrl: 'urn:ietf:wg:oauth:2.0:oob',
+  scopes: ['User.Read', 'offline_access'],
+  serviceConfiguration: {
+      authorizationEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+      tokenEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
+  }
+}
+
+
 
 type Props = {};
 export default class App extends Component<Props> {
+
+  authorize = async (config) => {
+    try {
+        const authState = await authorize(config);
+        Alert.alert(authState.accessToken)
+    } catch (error) {
+        Alert.alert('Inloggningen misslyckades', JSON.stringify(error.message));
+    }
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <TouchableOpacity 
+        style={{height: 100, width: 200, backgroundColor: 'gray', justifyContent: 'center', alignSelf: 'center'}} 
+        onPress={() => this.authorize(outlookConfig)}>
+
+          <Text style={{fontSize: 25, fontWeight: 'bold', color: 'black', textAlign: 'center', alignSelf: 'center'}}>Login with outlook</Text>
+
+        </TouchableOpacity>
       </View>
     );
   }
